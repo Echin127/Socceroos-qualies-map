@@ -11,9 +11,9 @@
   #controls { padding: 10px; background: #1b1b1b; color: #eee;
               display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   #controls button { padding: 6px 12px; border: 0; border-radius: 4px;
-              background: #d62828; color: #fff; cursor: pointer; font-size: 14px; }
-  #controls button:hover { background: #b51f1f; }
-  #controls button:disabled { background: #555; cursor: default; }
+              background: #ffb81c; color: #143e34; cursor: pointer; font-size: 14px; }
+  #controls button:hover { background: #c99016; }
+  #controls button:disabled { background: #aaaaaa; cursor: default; }
   #counter { font-weight: bold; }
   #caption { font-size: 20px; }
   #map { height: calc(100vh - 52px); }
@@ -25,7 +25,7 @@
                   background: rgba(27,27,27,0.85); color: #eee; padding: 6px 12px;
                   border-radius: 6px; font-size: 14px; font-weight: bold; }
   #map-hint { position: absolute; bottom: 20px; right: 10px; z-index: 1000;
-              background: rgba(27,27,27,0.75); color: #aaa; padding: 5px 10px;
+              background: rgba(27,27,27,0.75); color: #eee; padding: 5px 10px;
               border-radius: 6px; font-size: 12px; }
 
 </style>
@@ -40,7 +40,7 @@
   <span id="caption"></span>
 </div>
 <div id="map"></div>
-<div id="dist-counter">Total distance: 0 km</div>
+<div id="dist-counter">Distance Travelled: 0 km</div>
 <div id="map-hint">Click a marker for match details</div>
 
 
@@ -180,6 +180,10 @@ function render() {
     const colour = v.p[F.country] === HOME_COUNTRY ? HOME_COLOUR : AWAY_COLOUR;
     markers[i].setIcon(icon(i, colour, i === pos, v.p[F.country] === HOME_COUNTRY));
   });
+  markers.forEach((m, i) => {
+  m.setZIndexOffset(i === pos ? 1000 : 0);
+});
+
  if (pos === venues.length - 1) {
     legLines.forEach((line, i) => {
       const t = i / (venues.length - 2);
@@ -200,14 +204,14 @@ function render() {
   document.getElementById("counter").textContent = `Match ${pos+1} / ${venues.length}`;
   const capScore  = v.p[F.score]      || "–";
   const capAttend = v.p[F.attendance] ? v.p[F.attendance].toLocaleString() : "unknown";
-  document.getElementById("caption").textContent =
-    `\u3000 Australia v ${v.p[F.opponent]}: ${capScore}, ${v.p[F.date]}`
+  document.getElementById("caption").innerHTML =
+    `\u3000 <b>Australia v ${v.p[F.opponent]}: ${capScore}</b> <span style="font-size:14px">(${v.p[F.date]}, ${v.p[F.city]})`
 
 
   let totalKm = 0;
   for (let j = 0; j < pos; j++) totalKm += haversineKm(venues[j].latlng, venues[j+1].latlng);
   document.getElementById("dist-counter").textContent =
-    `Total distance: ${Math.round(totalKm).toLocaleString()} km`;
+    `Distance Travelled: ${Math.round(totalKm).toLocaleString()} km`;
   document.getElementById("btnPrev").disabled = pos === 0;
   document.getElementById("btnNext").disabled = pos === venues.length - 1;
 }
